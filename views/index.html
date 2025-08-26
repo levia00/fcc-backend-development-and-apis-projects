@@ -31,8 +31,18 @@
     </div>
     <div>
       <h2>URL Shortener Microservice</h2>
+      <p>Example: POST [project_url]/api/shorturl - https://www.google.com</p>
+      <form method="post" action="/api/shorturl">
+        <input placeholder="https://www.freecodecamp.org/" type="text" name="url" required />
+        <button type="submit">POST URL</button>
+      </form>
       <ul>
-        <li><a href="api/whoami">[project url]/api/whoami</a></li>
+        <h2>Example usage</h2>
+        <li><a href="https://spm-lite.netlify.app/">[project url]/api/shorturl/1</a></li>
+      </ul>
+      <ul>
+        <h2>Will redirect to</h2>
+        <li><a href="https://spm-lite.netlify.app/">https://spm-lite.netlify.app/</a></li>
       </ul>
     </div>
     <div class="footer">
