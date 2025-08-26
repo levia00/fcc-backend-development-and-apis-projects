@@ -3,7 +3,8 @@ var app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv')
 const dns = require('dns')
-const urlParser = require('url');
+const multer = require('multer')
+const upload = multer()
 dotenv.config()
 mongoose.connect(process.env.MONGO_URI)
 
@@ -84,6 +85,14 @@ app.post('/api/shorturl',(req,res)=>{
     console.error(e)
     res.json({error:"invalid url"});
   }
+})
+
+app.post('/api/fileanalyse',upload.single('upfile'),(req,res)=>{
+  res.json({
+    name:req.file.originalname,
+    type:req.file.mimetype,
+    size:req.file.size
+  })
 })
 
 app.get("/api/whoami",(req,res)=>{
