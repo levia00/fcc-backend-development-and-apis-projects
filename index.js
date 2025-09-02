@@ -1,10 +1,11 @@
 var express = require('express');
-var app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv')
 const dns = require('dns')
 const multer = require('multer')
+var cors = require('cors');
 const upload = multer()
+var app = express();
 dotenv.config()
 mongoose.connect(process.env.MONGO_URI)
 
@@ -12,12 +13,20 @@ const urlSchema = mongoose.Schema({
   original_url:{type:String,required:true},
   short_url:{type:Number,required:true,unique:true}
 })
+const userSchema = mongoose.Schema({
+  username:{type:String,required:true}
+})
+const exerciseSchema = mongoose.Schema({
+  uid:{type:String,required:true},
+  description:{type:String,required:true},duration:{type:Number,required:true},date:{type:String,required:true}
+})
 const Url = mongoose.model('Url',urlSchema);
+const User = mongoose.model('User',userSchema);
+const Exercise = mongoose.model('Exercise',exerciseSchema);
 
 // project-TIMESTAMP-MICROSERVICE
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
-var cors = require('cors');
 app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 204
 app.use(express.urlencoded({extended:true}))
 
@@ -26,6 +35,117 @@ app.use(express.static('public'));
 app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
+
+app.get("/api/users",async(req,res)=>{
+  try{
+    let users =await User.find({})
+    res.json(users)
+  }catch(e){
+    console.error(e)
+    res.json({error:"Server error"})
+  }
+  // User.find({}, function (err, users) {
+	// 	if (err) {
+	// 		console.error(err);
+	// 		res.json({
+	// 			message: 'Getting all users failed!',
+	// 		});
+	// 	}
+
+	// 	if (users.length === 0) {
+	// 		res.json({ message: 'There are no users in the database!' });
+	// 	}
+
+	// 	console.log('users in database: '.toLocaleUpperCase() + users.length);
+
+	// 	res.json(users);
+	// });
+})
+
+app.post("/api/users",async(req,res)=>{
+  const username = req.body.username?.trim();
+  if(!username){
+    return res.json({error:'username required'})
+  }
+  try{
+    let existing = await User.findOne({username:username});
+    if(existing){
+      return res.json({_id:existing._id,username:existing.username});
+    }
+    let newUser = new User({username:username});
+    await newUser.save();
+    res.json({username:newUser.username,_id:newUser._id})
+  }catch(e){
+    console.error(e)
+    res.json({error:"Server error"})
+  }
+})
+app.get("/api/users/:_id/logs",async(req,res)=>{
+  const { from, to, limit } = req.query;
+  const _id = req.params._id;
+
+  try {
+    const userDoc = await User.findById(_id);
+    if (!userDoc) return res.json({ error: "User not found" });
+
+    let filter = { uid: _id };
+    if (from || to) {
+      filter.date = {};
+      if (from) filter.date.$gte = new Date(from);
+      if (to) filter.date.$lte = new Date(to);
+    }
+
+    let query = Exercise.find(filter).select("-__v -uid");
+    if (limit) query = query.limit(Number(limit));
+
+    const exercises = await query.exec();
+
+    const log = exercises.map(e => ({
+      description: e.description,
+      duration: e.duration,
+      date: new Date(e.date).toDateString()
+    }));
+
+    res.json({
+      _id: userDoc._id,
+      username: userDoc.username,
+      count: log.length,
+      log
+    });
+  } catch (e) {
+    console.error(e);
+    res.json({ error: "Server error" });
+  }
+})
+app.post("/api/users/:_id/exercises",async(req,res)=>{
+  const {description,duration,date}=req.body;
+  const _id = req.params._id;
+  if(!_id || !description || !duration) return res.json({error:'missing params'});
+  let newDate;
+  try{
+    newDate = date ? new Date(date) : new Date()
+  }catch{
+    newDate = new Date()
+  }
+  newDate = new Date(newDate.toDateString())
+  try{
+    let userDoc = await User.findById(_id);
+    if (!userDoc) return res.json({ error: "User not found" });
+    let newExercise = new Exercise({
+      uid:_id,
+      description,
+      duration:Number(duration),
+      date:newDate
+    })
+    await newExercise.save()
+    let returnDate = new Date(newExercise.date).toDateString()
+    const {username} = userDoc;
+    res.json({_id:userDoc._id,username,date:returnDate,duration:newExercise.duration,description:newExercise.description})
+  }catch(e){
+    console.error(e)
+    res.json({error:'Server error'})
+  }
+})
 
 app.get("/api/shorturl/:id",async(req,res)=>{
   const id = parseInt(req.params.id);
