@@ -12,7 +12,8 @@
     <h1>Microservice</h1>
     <hr />
     <div class="container">
-      <h2>Timestamp Microservice Usage:</h2>
+      <div class="c-1">
+        <h2>Timestamp Microservice Usage:</h2>
       <ul>
         <li><a href="api/2015-12-25">[project url]/api/2015-12-25</a></li>
         <li><a href="api/1451001600000">[project url]/api/1451001600000</a></li>
@@ -22,43 +23,62 @@
       <p>
         <code>{"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</code>
       </p>
-    </div>
-    <div>
-      <h2>Request Header Parser Microservice</h2>
-      <ul>
-        <li><a href="api/whoami">[project url]/api/whoami</a></li>
-      </ul>
-    </div>
-    <div>
-      <h2>URL Shortener Microservice</h2>
-      <p>Example: POST [project_url]/api/shorturl - https://www.google.com</p>
-      <form method="post" action="/api/shorturl">
-        <input placeholder="https://www.freecodecamp.org/" type="text" name="url" required />
-        <button type="submit">POST URL</button>
-      </form>
-      <ul>
-        <h2>Example usage</h2>
-        <li><a href="https://spm-lite.netlify.app/">[project url]/api/shorturl/1</a></li>
-      </ul>
-      <ul>
-        <h2>Will redirect to</h2>
-        <li><a href="https://spm-lite.netlify.app/">https://spm-lite.netlify.app/</a></li>
-      </ul>
-    </div>
-    <div>
-      <h2>File Metadata Microservice</h2>
-      <p>Please upload a file</p>
       <div>
-        <form action="/api/fileanalyse" method="post" enctype="multipart/form-data">
-          <input type="file" name="upfile" />
-          <button type="submit">upload</button>
-        </form>
+        <h2>Request Header Parser Microservice</h2>
+        <ul>
+          <li><a href="api/whoami">[project url]/api/whoami</a></li>
+        </ul>
       </div>
-    </div>
-    <div class="footer">
-      <p>
-        By <a href="https://www.freecodecamp.org/">freeCodeCamp.org</a>
-      </p>
+      <div>
+        <h2>URL Shortener Microservice</h2>
+        <p>Example: POST [project_url]/api/shorturl - https://www.google.com</p>
+        <form method="post" action="/api/shorturl">
+          <input placeholder="https://www.freecodecamp.org/" type="text" name="url" required />
+          <button type="submit">POST URL</button>
+        </form>
+        <ul>
+          <h2>Example usage</h2>
+          <li><a href="https://spm-lite.netlify.app/">[project url]/api/shorturl/1</a></li>
+        </ul>
+        <ul>
+          <h2>Will redirect to</h2>
+          <li><a href="https://spm-lite.netlify.app/">https://spm-lite.netlify.app/</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>File Metadata Microservice</h2>
+        <p>Please upload a file</p>
+        <div>
+          <form action="/api/fileanalyse" method="post" enctype="multipart/form-data">
+            <input type="file" name="upfile" />
+            <button type="submit">upload</button>
+          </form>
+        </div>
+      </div>
+      </div>
+      <div class="c-2">
+        <h2>Exercise Tracker</h2>
+        <div class="c-2-1">
+          <form method="post" action="/api/users">
+            <h4>Create a New User</h4>
+            <span>POST /api/users</span>
+            <input placeholder="username" name="username" required type="text" />
+            <button type="submit">Submit</button>
+        </form>
+          <form action="/api/users/:_id/exercises" method="post">
+            <h4>Add exercises</h4>
+            <span>POST /api/users/:_id/exercises</span>
+            <input placeholder=":_id" required name="_id" />
+            <input placeholder="description*" type="text" name="description" required />
+            <input placeholder="duration* (mins.)" type="number" name="duration" required />
+            <input placeholder="date (yyyy-mm-dd)" name="date" type="text" />
+            <button type="submit">Submit</button>
+      </form>
+        </div>
+        <div><strong>GET user's exercise log:</strong> <p>GET /api/users/:_id/logs?[from][&to][&limit]</p></div>
+        <div>[ ] = optional</div>
+        <div><strong>from,to </strong>= dates (yyyy-mm-dd); <strong>limit</strong> = number</div>
+      </div>
     </div>
   </body>
 </html>
